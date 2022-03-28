@@ -4,7 +4,7 @@
 Programa que va a representar el funcionamiento de una pequeña tienda en línea.
 
 ### Integrantes:
- + Eyli Burguete Pech   [@EyliBurguete](h)
+ + Eyli Burguete Pech   [@EyliBurguete](htt)
  
  + Daniel García Cetina [@Daniel-Garcia-C](https://github.com/Daniel-Garcia-C)
  
