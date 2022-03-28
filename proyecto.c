@@ -13,7 +13,7 @@ FILE *doc;
 
 typedef struct producto{
 	char    nombre[30];
-	int     cantidad;
+	int     cantidad;		//ALMACENA LA ESTRUCTURA DE CADA PRODUCTO
 	float   precio;
 }PRODUCTO;
 
@@ -59,12 +59,8 @@ int agregarProducto(FILE *doc){
 	fflush(stdin);
 	scanf("%f", &elm.precio);
 
-	fseek(doc, 0L, SEEK_END); //POSICIONA AL FINAL DEL CARÁCTER
-	fprintf(doc, "%s\t", elm.nombre);
 	fseek(doc, 0L, SEEK_END);
-	fprintf(doc, "%d\t", elm.cantidad); //ESCRITURA AL .txt
-	fseek(doc, 0L, SEEK_END);
-	fprintf(doc, "%f\n", elm.precio);
+	fwrite(&elm,sizeof(elm),1,doc); 
 
 	/*printf("1: %d",sizeof(PRODUCTO));*/
 
@@ -84,37 +80,35 @@ int agregarProducto(FILE *doc){
 	}
 }
 
-	int mostrarNotas(){
+int mostrarNotas(FILE *doc){
 
-	char cadena[100];
-	int nLinea = 0;
+	PRODUCTO art;
+	
+	printf("\nLista Productos:");
 
-	doc = fopen("ListaProductos.txt", "rb+");
-		printf("\nLista Productos:");
-		
-		if( doc ){
-			printf( "\nExiste (ABIERTO)\n" );
-			return TRUE;
-		}
-		else{
-			printf( "\nError (NO ABIERTO)\n" ); //ERROR AL ABRIR ARCHIVO
-			return FALSE;
-		}
-
-		printf("Producto:\tCantidad\tPrecio");
-
-		while(fgets(cadena, sizeof(cadena), doc)){
-			printf("\t%d",nLinea);
-			nLinea++;
-		}	
-
-		if(ferror(doc)){
-			printf("Error de escritura");
-			return FALSE;//ERROR DURANTE LA ESCRITURA
-		}
-		return TRUE; 
-
+	if(doc){
+		printf( "\nExiste (ABIERTO)\n" );
 	}
+	else{
+		printf( "\nError (NO ABIERTO)\n" ); //ERROR AL ABRIR ARCHIVO
+		return FALSE;
+	}
+
+	fread(&art, sizeof(PRODUCTO), 1, doc);
+	
+/*	printf("\nProducto: %s", art.nombre);*/
+/*	printf("\nCantidad: %d", art.cantidad);*/
+/*	printf("\nPrecio: %f\n", art.precio);*/
+	printf("\nProducto: %s \nCantidad: %d \nPrecio: %f\n", art.nombre, art.cantidad, art.precio);
+	printf("\nFin de la info\n");
+	
+	if(ferror(doc)){
+		printf("Error de escritura");
+		return FALSE;//ERROR DURANTE LA ESCRITURA
+	}
+	
+	return 1;
+}
 
 int carritoDeCompras(){
 
@@ -129,8 +123,6 @@ int carritoDeCompras(){
 		printf( "\nError (NO ABIERTO)\n" );
 		return 1;
 		}
-	
-	mostrarNotas();
 
 	/*fread(PRODUCTO,sizeof(PRODUCTO),1,doc);*/
 
@@ -143,67 +135,83 @@ int carritoDeCompras(){
 	doc = fopen("CarritoUsuario.txt", "a+");
 	
 	printf("\nCreado el carrito de compras");
-	
-        fprintf(doc, "%s ", art.nombre);
-		fprintf(doc, "%d ", art.cantidad);
-		fprintf(doc, "%f", art.precio);
 
-		printf("\n¿Ingresar otro articulo? [s/n]");
+	fprintf(doc, "%s ", art.nombre);
+	fprintf(doc, "%d ", art.cantidad);
+	fprintf(doc, "%f", art.precio);
+		
+	printf("\n¿Ingresar otro articulo? [s/n]");
+	response = getchar();
+	fflush(stdin);
+		
+	if(response == 's' || response == 'S'){
+
+	}
+	else{
+		printf("\nPagar Ahora [s/n]");
 		response = getchar();
-		fflush(stdin);
+	}
+		
+	if(response == 'n' || response == 'N'){
+		return FALSE;
+	}
 
-		if(response == 's' || response == 'S'){
-			
-		}
-		else{
-			printf("\nPagar Ahora [s/n]");
-			response = getchar();
-		}
-
-		if(response == 'n' || response == 'N'){
-
-			return FALSE;
-		}
-
-		fclose(doc);
-
-			return TRUE;
-		}
+	return TRUE;
+}
 
 int main(int argc, char *argv[]) {
 
 	int cerrar;
 
-	do{
-		switch(mostrarMenuDeOpciones()){
-			case LISTAPRODUCTOS:
-				mostrarNotas();
-			break;
-			case AGREGARPRODUCTO:
-				printf("\nAgregar Producto");
-				doc = fopen("ListaProductos.txt", "rb+");
+do{
+	switch(mostrarMenuDeOpciones()){
+		case LISTAPRODUCTOS:
+			doc = fopen("ListaProductos.txt", "rb");
+			
+			mostrarNotas(doc);
+			
+			if( !fclose(doc) )
+				printf( "\nFichero cerrado\n" );
+			else{
+				printf( "\nError: fichero NO CERRADO\n" );
+				return 1; //ERROR DURANTE CIERRE DOCUMENTO
+			}
+			
+		break;
+		case AGREGARPRODUCTO:
+			printf("\nAgregar Producto");
+			doc = fopen("ListaProductos.txt", "rb+");
 
-				agregarProducto(doc);
+			agregarProducto(doc);
 
-				if( !fclose(doc) )
-					printf( "\nFichero cerrado\n" );
-				else{
-					printf( "\nError: fichero NO CERRADO\n" );
-					return 1; //ERROR DURANTE CIERRE DOCUMENTO
-					}
-			break;
-			case CARRITO:
-				printf("\nCarrito de Compras");
-					doc = fopen("ListaProductos.txt", "rb+");
-					
-					carritoDeCompras(doc);
-					
-			break;
-			case CERRAR:
-				cerrar = TRUE;
-			break;
-		}
-	}while(cerrar = TRUE);
+			if( !fclose(doc) )
+				printf( "\nFichero cerrado\n" );
+			else{
+				printf( "\nError: fichero NO CERRADO\n" );
+				return 1; //ERROR DURANTE CIERRE DOCUMENTO
+			}
+		break;
+		case CARRITO:
+			printf("\nCarrito de Compras");
+			
+			doc = fopen("ListaProductos.txt", "rb+");
+
+			carritoDeCompras(doc);
+			
+			if( !fclose(doc) ){
+				printf( "\nFichero cerrado\n" ); //CIERRE CORRECTAMENTE
+			}
+			else{
+				printf( "\nError: fichero NO CERRADO\n" );
+				return FALSE; //ERROR DURANTE CIERRE DOCUMENTO
+			}
+
+		break;
+		case CERRAR:
+			cerrar = TRUE;
+		break;
+	}
+}while((cerrar = TRUE));
 
 return 0;
 }
