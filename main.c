@@ -8,7 +8,7 @@
 #define CARRITO 2
 #define AGREGARPRODUCTO 3
 #define ELIMINARPRODUCTO 4
-#define CERRAR 6
+#define CERRAR 5
 
 //Se manejara los datos en modo binario en lugar de modo texto
 FILE *inventario;
@@ -46,7 +46,10 @@ int mostrarMenuDeOpciones(int validar){
 		do{
 		printf("\n\tEscoja el servicio: ");
 		scanf("%d", &opcion);
-		}while(opcion < 1 && opcion > 3);
+		}while(opcion < 1 || opcion > 3);
+		if(opcion == 3){
+			opcion = CERRAR;
+		}
 	}
 	//MENU ADMINISTRADOR (USO PRIVADO)
 	else{
@@ -66,10 +69,10 @@ int mostrarMenuDeOpciones(int validar){
 		do{
 		printf("\n\tEscoja el servicio: ");
 		scanf("%d", &opcion);
-		}while(opcion < 1 && opcion > 5);
+		}while(opcion < 1 || opcion > 5);
 	}
 	
-	if(opcion > 1 && opcion < 5){
+	if(opcion >= 1 && opcion <= 5){
 		return opcion;
 	}
 	
@@ -120,14 +123,14 @@ int asignarID(){
 	}
 	//COMPROBACION DE ERRORES
 	else{
-		printf("Error al abrir archivo(ID)");
+		printf("\n\tError al abrir archivo(ID)");
 	}
 	
 	if( !fclose( buscar ) ){
-	   printf( "\nFichero cerrado(ID)\n" );
+	   printf( "\n\tFichero cerrado(ID)\n" );
 	}
 	else{
-		printf( "\nError: fichero NO CERRADO(ID)\n" );
+		printf( "\n\tError: fichero NO CERRADO(ID)\n" );
 	}
 	
 	return id;
@@ -161,15 +164,15 @@ void agregarProducto(){
 	producto.ID = asignarID();
 
 	//ENTRADA DE DATOS
-	printf("\nIngrese Nombre:");
+	printf("\n\tIngrese Nombre:");
 	scanf("%s", producto.nombre);
 		
 	do{
-		printf("\nIngrese Cantidad:");
+		printf("\n\tIngrese Cantidad:");
 		scanf("%d", &producto.cantidad);
 	}while(producto.cantidad == 0);
 
-	printf("\nIngrese Precio:");
+	printf("\n\tIngrese Precio:");
 	scanf("%f", &producto.precio);
 	
 	//Escribiendo en modo binario
@@ -177,9 +180,9 @@ void agregarProducto(){
 	
 	//COMPROBACION DE ERRORES
 	if( !fclose( inventario ) )
-		printf( "\nFichero cerrado\n" );
+		printf( "\n\tFichero cerrado\n" );
 	else{
-		printf( "\nError: fichero NO CERRADO\n" );
+		printf( "\n\tError: fichero NO CERRADO\n" );
 	}
 }
 
@@ -201,7 +204,7 @@ int mostrarInventario(){
 	
 	//ERROR EN CASO DE QUE NO HABRA EL ARCHIVO
 	if(inventario == NULL){
-		printf("Error: No se ha podido abrir el archivo\n");
+		printf("\n\tError: No se ha podido abrir el archivo\n");
 		return 0;
 	}
 	else{
@@ -212,10 +215,8 @@ int mostrarInventario(){
 		printf("\n    ------------------------------------------------------");
 		printf("------------------------");
 	}
-	
-		//Romper el ciclo while hasta que feof() [Fin de l�nea] sea verdad
-		while(1){
-		
+		//Romper el ciclo while hasta que feof() [Fin de linea] sea verdad
+	while(1){
 		//Leer asignando a estructura producto, de tamanio producto, un solo producto del archivo
 		fread(&producto, sizeof(producto), 1, inventario);
 		
@@ -224,24 +225,20 @@ int mostrarInventario(){
 		}
 		//Mostrar en pantalla cada producto
 		printf("\n\t%d\t\t", producto.ID);
-		
 		printf("%s\t\t\t", producto.nombre);
-	
 		printf("   %d\t", producto.cantidad);
-		
 		printf("\t\t%0.2f\n\n", producto.precio);
-		}
+	}
+	printf("\n    ------------------------------------------------------");
+	printf("------------------------");
 	
-		printf("\n    ------------------------------------------------------");
-		printf("------------------------");
-		
-		//Comprobar si se cierra el fichero
-		if( !fclose( inventario ) ){
-			printf( "\nFichero cerrado\n" );
-		}
-		else{
-			printf( "\nError: fichero NO CERRADO\n" );
-		}
+	//Comprobar si se cierra el fichero
+	if( !fclose( inventario ) ){
+		printf( "\n\tFichero cerrado\n" );
+	}
+	else{
+		printf( "\n\tError: fichero NO CERRADO\n" );
+	}
 	return 0;
 }
 	
@@ -251,7 +248,6 @@ int mostrarInventario(){
 /*Objetivo: Que la funcion elimine un producto del archivo.dat(Lista de Productos)
 	de tal manera que no se vea afectado la secuencia ID*/
 void eliminarProducto(){
-	
 	//Variables
 	FILE* inventario;
 	FILE* temporal;
@@ -261,7 +257,6 @@ void eliminarProducto(){
 	
 	//Elimina la basura que pueda generar el agregar informacion a estructura
 	memset(&producto, 0, sizeof(struct structProduct));
-	
 
 	//Se abre lista de productos modo "rb" = Lectura en modo binario
 	inventario = fopen("ListaProductos.dat", "rb");
@@ -270,7 +265,7 @@ void eliminarProducto(){
 	
 	//Muestra el inventario
 	mostrarInventario();
-	printf("\nSeleccione el ID del producto a eliminar: ");
+	printf("\n\tSeleccione el ID del producto a eliminar: ");
 	scanf("%d", &id);
 	
 	//Funcion while: Leer todos los productos almacenados
@@ -284,7 +279,7 @@ void eliminarProducto(){
 		
 		//Si el producto con el ID buscado se encuentra:
 		if(id == producto.ID){
-			printf("\nArticulo Encontrado: %s", producto.nombre);
+			printf("\n\tArticulo Encontrado: %s", producto.nombre);
 		}
 		//Se escribe en un archivo temporal los productos excepto el seleccionado
 		else{
@@ -297,18 +292,17 @@ void eliminarProducto(){
 		}
 		
 	}
-	
 	//Comprobacion de cierre de archivos
 	if( !fclose( inventario ) )
-		  printf( "\nFichero cerrado PASO 1\n" );
+		  printf( "\n\tFichero cerrado PASO 1\n" );
 	else{
-		printf( "\nError: fichero NO CERRADO PASO 1\n" );
+		printf( "\n\tError: fichero NO CERRADO PASO 1\n" );
 	}
 	
 	if( !fclose( temporal ) )
-		printf( "\nFichero cerrado PASO 1\n" );
+		printf( "\n\tFichero cerrado PASO 1\n" );
 	else{
-		printf( "\nError: fichero NO CERRADO PASO 1\n" );
+		printf( "\n\tError: fichero NO CERRADO PASO 1\n" );
 	}
 	
 	//Se abre lista de productos modo "wb" = Crea un archivo binario o sobreescribe todos los datos, trucando a 0.
@@ -332,15 +326,15 @@ void eliminarProducto(){
 	
 	//Se comprueba que hayan cerrado los archivos
 	if( !fclose( inventario ) )
-		  printf( "\nFichero cerrado PASO 2\n" );
+		  printf( "\n\tFichero cerrado PASO 2\n" );
 	else{
-		printf( "\nError: fichero NO CERRADO PASO 2\n" );
+		printf( "\n\tError: fichero NO CERRADO PASO 2\n" );
 	}
 	
 	if( !fclose( temporal ) )
-		printf( "\nFichero cerrado PASO 2\n" );
+		printf( "\n\tFichero cerrado PASO 2\n" );
 	else{
-		printf( "\nError: fichero NO CERRADO PASO 2\n" );
+		printf( "\n\tError: fichero NO CERRADO PASO 2\n" );
 	}
 	
 }
@@ -348,20 +342,17 @@ void eliminarProducto(){
 //Funcion: Eliminar Redundancia
 //Programador: Daniel Garcia Cetina
 //Fecha: 4/Mayo/2022
-/*Objetivo: Al ingresar un arreglo de IDs solicitados de la funci�n carritoDeCompras
+/*Objetivo: Al ingresar un arreglo de IDs solicitados de la funcion carritoDeCompras
 	se elimine la redundancia de ID's que existen en el arreglo y retornarlo
 	sin repeticiones*/
 	
 int eliminarRedundancia(int* id, int elementsID, int limiteArray){
-	
 	//Variables
 	int aux;
 	
 	//Se realizar la eliminacion de  de cada valor repetido
 	for(int i = 0; i < elementsID - 1; i++){
-		
 		for(int j = i + 1; j < elementsID; j++){
-			
 			//En caso de repeticion se realiza un ordenamiento y sobreescritura
 			if(*(id+i) == *(id+j)){
 				
@@ -404,7 +395,7 @@ void ordenarIDs(int* id, int TAM){
 			}
 		}
 	}
-	//No retorna debido a que el apuntador reescribe los datos en la direccion de la variable
+//No retorna debido a que el apuntador reescribe los datos en la direccion de la variable
 }
 
 //Funcion: actualizarCantidad
@@ -450,7 +441,7 @@ void actualizarCantidad(structProduct* carrito, int cantidadP){
 		if(carrito -> ID == p.ID){
 
 			p.cantidad -= carrito -> cantidad;
-		
+
 			carrito++;
 		}
 			i++;
@@ -460,17 +451,17 @@ void actualizarCantidad(structProduct* carrito, int cantidadP){
 	
 	//Se comprueba que los archivos hayan cerrado
 	if( !fclose( inventario ) ){
-		  printf( "\nFichero cerrado PASO 1\n" );
+		  printf( "\n\tFichero cerrado PASO 1\n" );
 	}
 	else{
-		printf( "\nError: fichero NO CERRADO PASO 1\n" );
+		printf( "\n\tError: fichero NO CERRADO PASO 1\n" );
 	}
 	
 	if( !fclose( temporal ) ){
-		printf( "\nFichero cerrado PASO 1\n" );
+		printf( "\n\tFichero cerrado PASO 1\n" );
 	}
 	else{
-		printf( "\nError: fichero NO CERRADO PASO 1\n" );
+		printf( "\n\tError: fichero NO CERRADO PASO 1\n" );
 	}
 	
 	/*Se abre lista de productos modo "wb" = Crea un archivo binario o sobreescribe todos los datos, trucando a 0.*/
@@ -492,17 +483,17 @@ void actualizarCantidad(structProduct* carrito, int cantidadP){
 	
 	//Se comprueba que haya cerrado el inventario
 	if( !fclose( inventario ) ){
-		  printf( "\nFichero cerrado PASO 2\n" );
+		  printf( "\n\tFichero cerrado PASO 2\n" );
 	}
 	else{
-		printf( "\nError: fichero NO CERRADO PASO 2\n" );
+		printf( "\n\tError: fichero NO CERRADO PASO 2\n" );
 	}
 	
 	if( !fclose( temporal ) ){
-		printf( "\nFichero cerrado PASO 2\n" );
+		printf( "\n\tFichero cerrado PASO 2\n" );
 	}
 	else{
-		printf( "\nError: fichero NO CERRADO PASO 2\n" );
+		printf( "\n\tError: fichero NO CERRADO PASO 2\n" );
 	}
 }
 
@@ -556,11 +547,11 @@ void carritoDeCompras(){
 	
 	//Entrada de datos [ID]
 	do{
-		printf("\nSeleccione el producto (ID): ");
+		printf("\n\tSeleccione el producto (ID): ");
 		scanf("%d", &id[i]);
 		fflush(stdin);
 		
-		printf("\nCancelar[Cualquier tecla]");
+		printf("\n\tCancelar[Cualquier tecla]");
 		printf("     Continuar[Enter]: ");
 		scanf("%c", &answer);
 		fflush(stdin);
@@ -592,10 +583,10 @@ void carritoDeCompras(){
 		//Se filtran los productos que hayan sido solicitados en ID's
 		if((id[i] == producto.ID)){
 			//Muestra el producto seleccionado
-			printf("\t\nProducto Seleccionado");
-			printf("\t\nNombre: %s", producto.nombre);
-			printf("\t\nCantidad: %d", producto.cantidad);
-			printf("\t\nPrecio: %0.2f", producto.precio);
+			printf("\n\tProducto Seleccionado");
+			printf("\n\tNombre: %s", producto.nombre);
+			printf("\n\tCantidad: %d", producto.cantidad);
+			printf("\n\tPrecio: %0.2f", producto.precio);
 			
 			//En caso de que la cantidad del producto solicitado sea distinto de 0 (STOCK disponible)
 			if(producto.cantidad != 0){
@@ -667,7 +658,7 @@ void carritoDeCompras(){
 		printf("\n\t\tGracias por comprar con nosotros!\n");
 		printf("\n\t----------------------------------------------");
 		
-		//Actualizar la cantidad del inventario indicando la reducci�n de STOCK
+		//Actualizar la cantidad del inventario indicando la reduccion de STOCK
 		actualizarCantidad(carrito, count);
 		}
 	}
@@ -680,10 +671,10 @@ void carritoDeCompras(){
 	
 	//Verificar que cierre correctamente
 	if( !fclose(inventario) ){
-		printf( "\nFichero cerrado\n" );
+		printf( "\n\tFichero cerrado\n" );
 	}
 	else{
-		printf( "\nError: fichero NO CERRADO\n" );
+		printf( "\n\tError: fichero NO CERRADO\n" );
 	}
 }
 
@@ -692,13 +683,67 @@ void carritoDeCompras(){
 
 int main(int argc, char *argv[]) {
 	
+	//Variables de datos del usuario "Administrador"
+	char usuario[] = "xmoon";
 	int cerrar;
-	char usuario[7] = "MoonPie", user[7];
-	char contrasena[7] = "NVIA712", contr[7];
+	char user[7];
+	char contrasena[] = "xnvia";
+	char contr[7];
 	
-	int validacion = 1;
+	//Variables para validar
+	int validacion = 0;
+	int tipo, romper;
 	
+	//Menu de ingreso
+	printf("\n     -------------------------------------");
+	printf("\n\t  Menu de ingreso NVIA\n");
+	printf("\tSeleccionar el tipo de usuario: \n");
+	printf("\n\t1. Usuario");
+	printf("\n\t2. Administrador");
+	printf("\n     -------------------------------------");
+	
+	//Entrada de datos
 	do{
+		printf("\n\tEleccion:");
+		scanf("%d",&tipo);
+	}while(tipo < 1 || tipo > 2);
+	
+	//Usuario
+	if(tipo == 1){
+		printf("\n\tHa ingresado como usuario");
+	}
+	//Administrador: comprobar usuario y contrasena, posibilidad de cambiar a usuario
+	else if(tipo == 2){
+		
+		do{
+			printf("\n\tIngrese usuario: ");
+			scanf("%s", user);
+			
+			fflush(stdin);
+			
+			printf("\n\tIngrese contrasena: ");
+			scanf("%s", contr);
+			
+			fflush(stdin);
+			
+			if((strcmp(user, usuario) == 0) && (strcmp(contrasena, contr) == 0)){
+				printf("\n\tHa ingresado como administrador");
+				validacion++;
+			}
+			else{
+				printf("\t\nIngresar como Cliente [Press: 5]");
+				printf("\t\nReintentar[Cualquier tecla]");
+				scanf("%d", &romper);
+			}
+			if(romper == 5){
+				break;
+			}
+		}while((strcmp(user, usuario) != 0) && (strcmp(contrasena, contr) != 0));
+	}
+	
+	//switch que llama a todas las funciones de la tienda
+	do{
+		//Se manda el tipo de usuario para mostrar Menu de opciones
 		switch(mostrarMenuDeOpciones(validacion)){
 		case LISTAPRODUCTOS:
 			
@@ -708,23 +753,30 @@ int main(int argc, char *argv[]) {
 			
 			break;
 		case AGREGARPRODUCTO:
+			printf("\n     -------------------------------------");
 			printf("\n\tAgregar Producto");
 			
 			agregarProducto();
 			
+			printf("\n     -------------------------------------");
+			
 			break;
 		case CARRITO:
-			printf("\nCarrito de Compras");
+			printf("\n     -------------------------------------");
+			printf("\n\tCarrito de Compras");
 			
 			mostrarInventario();
 			carritoDeCompras();
 		
+			printf("\n     -------------------------------------");
 			break;
 		case ELIMINARPRODUCTO:
-			printf("\nEliminar Producto");
+			printf("\n     -------------------------------------");
+			printf("\n\tEliminar Producto");
 			
 			eliminarProducto();
 			
+			printf("\n     -------------------------------------");
 			break;
 		case CERRAR:
 			cerrar = TRUE;
